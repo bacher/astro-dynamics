@@ -1,4 +1,6 @@
 const G = 6.6743e-11;
+const MOON_MASS = 7.34767309e22;
+
 const HOUR = 60 * 60;
 
 const iter_limit = 10_000_000;
@@ -10,32 +12,34 @@ const DISTANCES = [5, 7, 10, 13, 17, 20, 25, 30, 35, 40, 50, 70, 80, 100, 110, 1
 
 function check({mass, distance, save_results = false}: {mass: number, distance: number, save_results?: boolean}) {
   const time_passed = simulate(mass, distance);
-  const approx_time = getTimeToCollapseByMassAndRadius({mass, distance });
-
+  const approx_time_0 = getTimeToCollapseByMassAndDistance({mass, distance });
+  const approx_time_1 = getTimeToCollapseByMassAndDistance_2({mass, distance });
+  
   if (save_results) {
     results.push({mass, distance, time_passed});
   }
 
-  const d_f = distance.toString().padStart(5);
+  const d_f = (distance / 1000).toString().padStart(13);
   const m_f = formatMass(mass);
-  const sim_time_f = (time_passed/HOUR).toFixed(3).padStart(9);
-  const approx_time_f = (approx_time/HOUR).toFixed(3).padStart(9);
-  const error_f = (((approx_time-time_passed)/time_passed)*100).toFixed(1).padStart(5);
-
-  console.log(`M: ${m_f}, D: ${d_f}m, sim_time: ${sim_time_f}h, approx_time: ${approx_time_f}h, error: ${error_f}%`);
+  const sim_time_f = (time_passed/HOUR).toFixed(3).padStart(15);
+  console.log(`M: ${m_f}, D: ${d_f}km,      sim_time: ${sim_time_f}h\n${[approx_time_0, approx_time_1].map((approx_time, index) => {
+    const approx_time_f = (approx_time/HOUR).toFixed(3).padStart(15);
+    const error_f = (((approx_time-time_passed)/time_passed)*100).toFixed(1).padStart(7);
+    return `                                        approx_time_${index}: ${approx_time_f}h, error: ${error_f}%`
+  }).join('\n')}`);
 }
 
 function formatMass(mass: number): string {
   if (mass < 1_000) {
-    return `${mass}kg`.padStart(10);
+    return `${mass}kg`.padStart(15);
   }
   if (mass < 1_000_000) {
-    return `${Math.round(mass / 1_000)}ton`.padStart(10);
+    return `${Math.round(mass / 1_000)}ton`.padStart(15);
   }
   if (mass < 1_000_000_000) {
-    return `${Math.round(mass / 1_000_000)} mln kg`.padStart(10);
+    return `${Math.round(mass / 1_000_000)} mln kg`.padStart(15);
   }
-  return `${Math.round(mass / 1_000_000_000)} bln kg`.padStart(10);
+  return `${Math.round(mass / 1_000_000_000)} bln kg`.padStart(15);
 }
 
 function simulate(mass: number, distance: number): number {
@@ -120,18 +124,18 @@ function getMultiplierFromMass_2(mass:number): number {
   return (0.16 / (mass/10_000 + 0.14))**(1/1.2) + 0.07;
 }
 
-function getTimeToCollapseByMassAndRadius({mass, distance}: {mass: number, distance: number}): number {
+function getTimeToCollapseByMassAndDistance({mass, distance}: {mass: number, distance: number}): number {
   return (getMultiplierFromMass_2(mass) * (distance ** (2-0.502))) * HOUR
 }
 
 // console.log(getMultiplierFromMass_2(10_000).toFixed(3));
 
-// for (const mass of MASSES) {
-//   for (const distance of DISTANCES) {
-//     check({mass, distance});
-//   }
-//   console.log('---');
-// }
+for (const mass of MASSES) {
+  for (const distance of DISTANCES) {
+    check({mass, distance});
+  }
+  console.log('---');
+}
 
 // check({mass: 100_000, distance: 10000, save_results: true});
 // check({mass: 10_000_000, distance: 100000, save_results: true});
@@ -139,9 +143,15 @@ function getTimeToCollapseByMassAndRadius({mass, distance}: {mass: number, dista
 // check({mass: 1_000_000_000, distance: 1_000_000, save_results: true});
 // check({mass: 2_000_000_000, distance: 1_000_000, save_results: true});
 
-for (const mass of MASSES) {
-  check({mass, distance: 1_000, save_results: true});
-}
+// for (const distance of [1_000_000, 10_000_000, 50_000_000, 100_000_000]) {
+//   check({mass: MOON_MASS, distance, save_results: true});
+// }
+// for (const distance of [1_000_000, 10_000_000, 50_000_000, 100_000_000]) {
+//   check({mass: MOON_MASS * 1.5, distance, save_results: true});
+// }
+// for (const distance of [1_000_000, 10_000_000, 50_000_000, 100_000_000]) {
+//   check({mass: MOON_MASS * 2, distance, save_results: true});
+// }
 
 // for (const distance of DISTANCES) {
 //   check({mass: 10_000, distance, save_results: true});
@@ -149,9 +159,38 @@ for (const mass of MASSES) {
 
 if (results.length > 0) {
   console.log(results.map(({mass, distance, time_passed}) => {
-    const x = mass;
+    const x = Math.log(distance)
+    // const x = mass;
     // const y = time_passed / HOUR;
-    const y = time_passed;
-    return `(${x}, ${y.toFixed(3)})`;
+    const y = Math.log(time_passed);
+    return `(${x.toFixed(3)}, ${y.toFixed(3)})`;
   }).join(', '));
 }
+
+
+// https://www.desmos.com/calculator/vunbpmqlc3
+// When mass = MOON_MASS, x = ln(distance), y = ln(time_passed), the equation approximately equals to:
+// y = 1.49x - 14.68
+// ln(time_passed) = 1.49 * ln(distance) - 14.68
+// time_passed = e ^ (1.49 * ln(distance) - 14.68)
+
+// When mass = MOON_MASS * 1.5:
+// y = 1.49x - 14.87
+
+// When mass = MOON_MASS * 2:
+// y = 1.49x - 15.02
+// https://www.desmos.com/calculator/fmwcg7bblb
+
+console.log([{mass: MOON_MASS, coef: 14.68}, {mass: MOON_MASS * 1.5, coef: 14.87 }, {mass: MOON_MASS * 2, coef: 15.02 }].map(({mass, coef}) => {
+  return `(${mass/MOON_MASS}, ${coef})`;
+}).join(', '));
+// (1, 14.68), (1.5, 14.87), (2, 15.02)
+// y = 0.36x + 14.33
+
+// time_passed = e ^ (1.49 * ln(distance) - (0.36 * (mass/MOON_MASS) + 14.33)) 
+
+function getTimeToCollapseByMassAndDistance_2({mass, distance}: {mass: number, distance: number}): number {
+  return Math.E ** (1.49 * Math.log(distance) - (0.36 * (mass/MOON_MASS) + 14.33));
+}
+
+// console.log(getTimeToCollapseByMassAndDistance_2({mass: MOON_MASS, distance: 1_000_000}));

@@ -1,6 +1,7 @@
 const G = 9.81;
 const SPEED_OF_LIGHT = 299_792_458;
-const SPEED_LIMIT = SPEED_OF_LIGHT * 0.9999999;
+const SPEED_LIMIT_PERCENT = 0.999999999;
+const SPEED_LIMIT = SPEED_OF_LIGHT * SPEED_LIMIT_PERCENT;
 const DAY = 24 * 60 * 60;
 const YEAR = 365.25 * DAY;
 const LIGHT_YEAR = SPEED_OF_LIGHT * YEAR;
@@ -92,7 +93,7 @@ function accelerate({
 
 function prettyPrintAccelerationResult(state: AccelerationState) {
   console.log(`Iteration:           ${state.iteration}`);
-  console.log(`Speed:               ${state.world_speed.toFixed(0)} m/s`);
+  console.log(`Speed:               ${state.world_speed.toFixed(2)} m/s`);
   console.log(
     `  of speed of light: ${(state.world_speed / SPEED_OF_LIGHT).toFixed(10)}`
   );
@@ -115,5 +116,5 @@ function prettyPrintAccelerationResult(state: AccelerationState) {
   );
 }
 
-console.log("Speed limit", SPEED_LIMIT.toFixed(0));
+console.log("Speed limit:", SPEED_LIMIT_PERCENT.toFixed(10));
 accelerate({});

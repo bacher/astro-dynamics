@@ -1,3 +1,5 @@
+Speed limit 299792428
+---
 Iteration:           51020
 Speed:               29980177 m/s
   of speed of light: 0.1000031068
@@ -53,28 +55,28 @@ World time passed:   328 d
 Slowliness:          0.599997 (59.9997%) (slower in 1.67 times)
 ---
 Iteration:           570335
-Speed:               269813635 m/s
-  of speed of light: 0.9000014105
-Distance:            5168185437046951 m
+Speed:               269813507 m/s
+  of speed of light: 0.9000009826
+Distance:            5168177342639824 m
   of light year:     0.546
 Local time passed:   318 d
 World time passed:   396 d
-Slowliness:          0.435887 (43.5887%) (slower in 2.29 times)
+Slowliness:          0.435888 (43.5888%) (slower in 2.29 times)
 ---
-Iteration:           638313
-Speed:               284803055 m/s
-  of speed of light: 0.9500007334
-Distance:            6300919385076493 m
+Iteration:           706291
+Speed:               284802874 m/s
+  of speed of light: 0.9500001306
+Distance:            6300903972685953 m
   of light year:     0.666
 Local time passed:   336 d
 World time passed:   443 d
-Slowliness:          0.312248 (31.2248%) (slower in 3.20 times)
+Slowliness:          0.312250 (31.2250%) (slower in 3.20 times)
 ---
-Iteration:           797776
-Speed:               299789462 m/s
-  of speed of light: 0.9999900055
-Distance:            9120616037263242 m
-  of light year:     0.964
+Iteration:           2321443
+Speed:               299792428 m/s
+  of speed of light: 0.9999999000
+Distance:            9157513449309188 m
+  of light year:     0.968
 Local time passed:   354 d
-World time passed:   554 d
-Slowliness:          0.004471 (0.4471%) (slower in 223.67 times)
+World time passed:   555 d
+Slowliness:          0.000447 (0.0447%) (slower in 2236.31 times)

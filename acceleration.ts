@@ -1,6 +1,6 @@
 const G = 9.81;
 const SPEED_OF_LIGHT = 299_792_458;
-const SPEED_LIMIT = SPEED_OF_LIGHT * 0.9999;
+const SPEED_LIMIT = SPEED_OF_LIGHT * 0.9999999;
 const DAY = 24 * 60 * 60;
 const YEAR = 365.25 * DAY;
 const LIGHT_YEAR = SPEED_OF_LIGHT * YEAR;
@@ -23,7 +23,8 @@ type AccelerationState = {
 let next_log_at_world_speed = 0.1;
 
 function accelerate({
-  sim_world_step_interval = DEFAULT_SIM_WORLD_STEP_INTERVAL,
+  sim_world_step_interval:
+    initial_sim_world_step_interval = DEFAULT_SIM_WORLD_STEP_INTERVAL,
   acceleration = G,
 }: AccelerationOptions): void {
   let iteration = 0;
@@ -32,13 +33,8 @@ function accelerate({
   let local_time_passed = 0;
   let world_time_passed = 0;
 
-  let log_count = 0;
-
   function log() {
-    if (log_count > 0) {
-      console.log("---");
-    }
-    log_count += 1;
+    console.log("---");
 
     prettyPrintAccelerationResult({
       iteration,
@@ -52,6 +48,14 @@ function accelerate({
 
   while (true) {
     iteration += 1;
+
+    let sim_world_step_interval = initial_sim_world_step_interval;
+
+    if (world_speed >= SPEED_LIMIT * 0.95) {
+      sim_world_step_interval *= 0.1;
+    } else if (world_speed >= SPEED_LIMIT * 0.9) {
+      sim_world_step_interval *= 0.5;
+    }
 
     const speed_ratio = world_speed / SPEED_OF_LIGHT;
     const slowliness_ratio = Math.sqrt(1 - speed_ratio ** 2);
@@ -111,4 +115,5 @@ function prettyPrintAccelerationResult(state: AccelerationState) {
   );
 }
 
+console.log("Speed limit", SPEED_LIMIT.toFixed(0));
 accelerate({});

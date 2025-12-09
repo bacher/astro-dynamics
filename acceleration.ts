@@ -4,10 +4,10 @@ const SPEED_LIMIT = SPEED_OF_LIGHT * 0.9999;
 const DAY = 24 * 60 * 60;
 const YEAR = 365.25 * DAY;
 const LIGHT_YEAR = SPEED_OF_LIGHT * YEAR;
-const DEFAULT_SIM_LOCAL_STEP_INTERVAL = 60;
+const DEFAULT_SIM_WORLD_STEP_INTERVAL = 60;
 
 type AccelerationOptions = {
-  sim_local_step_interval?: number;
+  sim_world_step_interval?: number;
   acceleration?: number;
 };
 
@@ -23,7 +23,7 @@ type AccelerationState = {
 let next_log_at_world_speed = 0.1;
 
 function accelerate({
-  sim_local_step_interval = DEFAULT_SIM_LOCAL_STEP_INTERVAL,
+  sim_world_step_interval = DEFAULT_SIM_WORLD_STEP_INTERVAL,
   acceleration = G,
 }: AccelerationOptions): void {
   let iteration = 0;
@@ -56,14 +56,15 @@ function accelerate({
     const speed_ratio = world_speed / SPEED_OF_LIGHT;
     const slowliness_ratio = Math.sqrt(1 - speed_ratio ** 2);
 
-    local_time_passed += sim_local_step_interval;
-    const world_time_increment = sim_local_step_interval / slowliness_ratio;
-    world_time_passed += world_time_increment;
+    world_time_passed += sim_world_step_interval;
+    const local_time_increment = sim_world_step_interval * slowliness_ratio;
+    local_time_passed += local_time_increment;
 
-    const world_speed_increment = acceleration * sim_local_step_interval;
+    const world_speed_increment =
+      acceleration * slowliness_ratio * sim_world_step_interval;
 
     world_distance +=
-      (world_speed + world_speed_increment / 2) * world_time_increment;
+      (world_speed + world_speed_increment / 2) * sim_world_step_interval;
 
     world_speed += world_speed_increment;
 
